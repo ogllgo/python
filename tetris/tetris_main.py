@@ -117,22 +117,19 @@ def draw(screen, blocks: list[Block], piece: Piece) -> None:
         if (block.isDead()): colour = deadColour
         rect = pygame.Rect(block.x * pixelsPerSpace + 1, block.y * pixelsPerSpace + 1, filledPixels, filledPixels)
         pygame.draw.rect(screen, colour, rect)
-    pass
 
 def main():
-
-    screen = pygame.display.set_mode((boardX, boardY)) 
-
-    pygame.display.set_caption("Tetris") 
-
-    pygame.display.flip() 
-
-    running = True
-
     score: int = 0
     piece: Piece = Piece()
     piece.blocks = makeBlocks(math.floor(maxX / 2), math.floor(maxY / 2), piece.type)
     deads = []
+    fallTime = time.time()
+
+    screen = pygame.display.set_mode((boardX, boardY)) 
+    pygame.display.set_caption("Tetris") 
+    pygame.display.flip() 
+    
+    running = True
     while running: 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
@@ -142,14 +139,17 @@ def main():
                     piece.rotate()
                 elif event.key == 99:
                     piece.rotate(False)
-        piece.fall(deads)
+        if fallTime < time.time():
+            piece.fall(deads)
+            fallTime = time.time() + 0.1
         if piece.dead:
             deads += piece.blocks
             piece = Piece()
             piece.blocks = makeBlocks(math.floor(maxX / 2), math.floor(maxY / 2), piece.type)
-        screen.fill(0)
+        
+        screen.fill((0, 0, 0))
         draw(screen, deads, piece)
         pygame.display.flip()
-        time.sleep(1)
+    pygame.quit()
 
 main()

@@ -78,7 +78,7 @@ while running:
         if (pointsColliding(snake, apple)): 
             apples[i] = makeApple(snake + apples)
             desiredSnakeLength += 1
-    screen.fill((0, 0, 0))
+    
     while len(apples) < desiredAppleAmount:
         apple = makeApple(apples + snake)
         if apple: apples.append(apple)
@@ -94,6 +94,7 @@ while running:
     if (time.time() > moveDelay):
         snake = moveSnake(snake, dir, desiredSnakeLength)
         moveDelay += 0.1
+    screen.fill((0, 0, 0))
     drawApples(screen, apples)
     drawSnake(screen, snake)
     pygame.display.flip()
