@@ -6,15 +6,6 @@ import random
 boardX = 1200
 boardY = 1200
 
-"""
-line = Block(x, y), Block(x + 1, y), Block(x + 2, y), Block(x + 3, y)
-j = Block(x, y), Block(x, y + 1), Block(x + 1, y + 1), Block(x + 2, y + 1)
-l = Block(x + 2, y), Block(x, y + 1), Block(x + 1, y + 1), Block(x + 2, y + 1)
-o = Block(x + 1, y), Block(x + 2, y), Block(x + 1, y + 1), Block(x + 2, y + 1)
-s = Block(x + 1, y), Block(x + 2, y), Block(x, y + 1), Block(x + 1, y + 1)
-t = Block(x + 1, y), Block(x, y + 1), Block(x + 1, y + 1), Block(X + 2, y + 1)
-z = Block(x, y), Block(x + 1, y), Block(x + 1, y + 1), Block(x + 2, y + 1)
-"""
 pixelsPerSpace = 10
 filledPixels = 8
 
@@ -128,7 +119,7 @@ def main():
     screen = pygame.display.set_mode((boardX, boardY)) 
     pygame.display.set_caption("Tetris") 
     pygame.display.flip() 
-    
+
     running = True
     while running: 
         for event in pygame.event.get():
