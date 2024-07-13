@@ -2,6 +2,18 @@ import typing as ty
 import pygame as pg
 import time
 import math
+
+def makeScreen(coordinates: tuple[int, int], name: str):
+    screen = pg.display.set_mode(coordinates) 
+    pg.display.set_caption(name) 
+    pg.display.flip() 
+    return screen
+dims = (1000, 500)
+board = makeScreen(dims, "test")
+background = (50, 50, 50)
+board.fill(background)
+
+
 letters: ty.Dict[
     str, ty.List[ty.List[str]]
 ] = {
@@ -31,7 +43,6 @@ letters: ty.Dict[
     "X": [[" "," "," "," "," "," "," "," "],[" ","#"," "," "," "," ","#"," "],[" "," ","#"," "," ","#"," "," "],[" "," "," ","#","#"," "," "," "],[" "," "," ","#","#"," "," "," "],[" "," "," ","#","#"," "," "," "],[" "," ","#"," "," ","#"," "," "],[" ","#"," "," "," "," ","#"," "]],
     "Y": [[" "," "," "," "," "," "," "," "],[" ","#"," "," "," "," ","#"," "],[" "," ","#"," "," ","#"," "," "],[" "," "," ","#","#"," "," "," "],[" "," "," ","#"," "," "," "," "],[" "," "," ","#"," "," "," "," "],[" "," "," ","#"," "," "," "," "],[" "," "," ","#"," "," "," "," "]],
     "Z": [[" "," "," "," "," "," "," "," "],[" ","#","#","#","#","#","#"," "],[" "," "," "," "," ","#"," "," "],[" "," "," "," ","#"," "," "," "],[" "," "," "," ","#"," "," "," "],[" "," "," ","#"," "," "," "," "],[" "," ","#"," "," "," "," "," "],[" ","#","#","#","#","#","#"," "]],
-
 
     "a": [[" "," "," "," "," "," "," "],[" "," "," "," "," "," "," "],[" "," "," "," "," "," "," "],[" "," ","#","#","#"," "," "],[" "," "," "," "," ","#"," "],[" "," ","#","#","#","#"," "],[" ","#"," ","#","#","#"," "],[" ","#","#","#"," ","#"," "]],
     "b": [[" ","#"," "," "," "," "," "," "],[" ","#"," "," "," "," "," "," "],[" ","#"," "," "," "," "," "," "],[" ","#","#","#","#","#"," "," "],[" ","#"," "," "," "," ","#"," "],[" ","#"," "," "," "," ","#"," "],[" ","#"," "," "," "," ","#"," "],[" ","#","#","#","#","#","#"," "]],
@@ -89,67 +100,44 @@ def draw_sprite(surface: pg.Surface, position: ty.Tuple[float, float], spriteDat
             rect = pg.Rect(currPosition[0], currPosition[1], scalingFactor, scalingFactor)
             pg.draw.rect(surface, colour, rect)
 
-def makeScreen(coordinates: tuple[int, int], name: str):
-    screen = pg.display.set_mode(coordinates) 
-    pg.display.set_caption(name) 
-    pg.display.flip() 
-    return screen
 
-def drawLine(board: pg.Surface, phrase: str, offsets: ty.Tuple[int, int], colours: ty.List[ty.Tuple[int, int, int]], scalingFactor: float = 1) -> None:
-    """
-    board: the board to draw it on.
-    phrase: the phrase to say. Newlines will not work.
-    offsets: the top left of where to draw.
-    colours: the colours of each letter (wraps around, 1 colour works).
-    scalingFactor: how large should it be.
 
-    Examples:
-    ```py
-    drawLine(pg.display.set_mode((500, 50)), "Hello World!", (0, 0), [(100, 100, 100), (200, 200, 200)], 2)
-
-    drawLine(pygame.display.set_mode(400, 400), "Hi, Universe!", (18, 0), [(255, 255, 255), (100, 100, 100)], 1)
-    ```
-    """
+def countPixels(word: str) -> int:
+    totalLength = sum([max([len(pixelLetter) for pixelLetter in makeLetter((0,0,0), letter)]) for letter in word])
+    return totalLength
+def printPhrase(board: pg.Surface, phrase: str, position: ty.Tuple[float, float], scalingFactor: float = 1):
+    y_pos, x_pos = position
+    words = phrase.split()
+    lines = [""]
+    for word in words:
+        lineLength: float = countPixels(lines[-1]) * scalingFactor
+        wordLength: float = countPixels(word) * scalingFactor
+        if lineLength + wordLength > dims[0]:
+            lines.append("")
+            lineLength: float = countPixels(lines[-1]) * scalingFactor
+            print("adding a line")
+        print(f"Current line: '{lines[-1]}', length: {lineLength}")
+        print(f"Word: '{word}', length: {wordLength}")
+        print(f"Total length: {lineLength + wordLength}")
+        lines[-1] += word + " "
+    print(len(lines))
+    for line in lines:
+        drawLine(board, line, (y_pos, x_pos), [(200, 200, 255)], scalingFactor)
+        y_pos += 9 * scalingFactor
+def drawLine(board: pg.Surface, phrase: str, offsets: ty.Tuple[float, float], colours: ty.List[ty.Tuple[int, int, int]], scalingFactor: float = 1) -> None:
     newLetters: ty.List[ty.List[ty.List[ty.Tuple[int, int, int, str]]]] = []
     for index in range(len(phrase)):
         letter = phrase[index]
         colour = colours[index % len(colours)]
         newLetters.append(makeLetter(colour, letter))
     before = 0
-    positions: ty.Tuple[float, float] = offsets
     for index in range(len(newLetters)):
         letter = newLetters[index]
-        positions = (positions[0], before + max([len(line) for line in newLetters[index - 1]]) * scalingFactor*1.2)
-        draw_sprite(board, positions, letter, scalingFactor)
-        before = positions[1]
-board = makeScreen((1600, 500), "test")
-background = (50, 50, 50)
-board.fill(background)
-phrase = """Antidisestablishmentarianism.
-Antidisestablishmentarianism."""
-newLetters: ty.List[ty.List[ty.List[ty.Tuple[int, int, int, str]]]] = []
-for letter in phrase:
-    newLetters.append(makeLetter((200, 200, 255), letter))
-before = 0
-scale: int = 5
-index = 0
-x_pos = scale
-y_pos = 20
-for letter in newLetters:
-    if phrase[index] == "\n":
-        print("newLine")
-        y_pos += 10*scale
-        x_pos = 0
-        before = 0
-        index += 1
-        continue
-    if index > 0:
-        x_pos = before + max([len(line) for line in newLetters[index - 1]]) * 1.2*scale
-    draw_sprite(board, (y_pos, x_pos), letter, scale)
-    before = x_pos
-    index += 1
+        offsets = (offsets[0], before + max([len(line) for line in newLetters[index - 1]]) * scalingFactor*1.2)
+        draw_sprite(board, offsets, letter, scalingFactor)
+        before = offsets[1]
 
-drawLine(pg.display.set_mode((800, 800)), "Hello!", (18, 0), [(255, 255, 255), (100, 100, 100)], math.pi*2)
+printPhrase(board, "this is a very long phrase that should be split up by the end of the screen", (0,0), scalingFactor=3)
 pg.display.flip()
 Running = True
 down: ty.Tuple[bool, bool, bool] = (False, False, False)
@@ -170,10 +158,6 @@ while Running:
     if down[0]:
         pg.draw.line(board, (255, 255, 255), mouse, previous_mouse)
         board.fill((255, 255, 255), pg.rect.Rect(mouse[0], mouse[1], 1, 1))
-    if down[0]:
-        print("M1 is down")
-    else:
-        print("M1 is up")
     previous_mouse = mouse
     time.sleep(0.2)
     pg.display.flip()
