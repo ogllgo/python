@@ -102,10 +102,11 @@ def draw_sprite(surface: pg.Surface, position: ty.Tuple[float, float], spriteDat
 
 
 
-def countPixels(word: str) -> int:
+def countPixels(word: str) -> int: # works
     totalLength = sum([max([len(pixelLetter) for pixelLetter in makeLetter((0,0,0), letter)]) for letter in word])
     return totalLength
 def printPhrase(board: pg.Surface, phrase: str, position: ty.Tuple[float, float], scalingFactor: float = 1):
+    # doesnt work??
     y_pos, x_pos = position
     words = phrase.split()
     lines = [""]
