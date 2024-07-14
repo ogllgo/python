@@ -91,9 +91,11 @@ class Piece:
             self.hurt()
             return
         self.blocks = newBlocks
-    def rotate(self, clockwise: bool = True):
+    def rotate(self, deads: list[Block], clockwise: bool = True):
         maxRepeats = 4
         if clockwise: maxRepeats = 1
+        before = self.blocks
+
         for z in range(maxRepeats):
             minx = min(block.x for block in self.blocks)
             miny = min(block.y for block in self.blocks)
@@ -108,6 +110,10 @@ class Piece:
                 self.blocks = [Block(block.x + 1, block.y, block.alive) for block in self.blocks]
             while max(block.x for block in self.blocks) > maxX:
                 self.blocks = [Block(block.x - 1, block.y, block.alive) for block in self.blocks]
+        for block in deads:
+            if block in self.blocks:
+                self.blocks = before
+                return
 
 def makeBlocks(x: int, y: int, type: str, dead: list[Block]) -> list[Block]:
     if type == "line":
@@ -163,7 +169,12 @@ def main():
             keys=pygame.key.get_pressed()
             if keys[pygame.K_x]:
                 if rotateTime < time.time():
-                    piece.rotate()
+                    piece.rotate(deads)
+                    rotateTime = time.time() + 0.1
+            elif keys[pygame.K_c]:
+                if rotateTime < time.time():
+                    for i in range(3):
+                        piece.rotate(deads)
                     rotateTime = time.time() + 0.1
             elif keys[pygame.K_a]:
                 if moveTime < time.time():
@@ -179,6 +190,7 @@ def main():
             piece.fall(deads)
             fallTime = time.time() + (1 / min(level + 3, 13))
         if piece.dead:
+            score += 10
             deads += piece.blocks
             for liveBlock in piece.blocks:
 
