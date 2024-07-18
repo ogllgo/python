@@ -429,6 +429,7 @@ def handleChar(phrase: str, pressed_key: str, capital: bool) -> str:
         print(f"Unknown value: {pressed_key!r}")
     return phrase
 
+mode = 0
 while Running:
     for event in pg.event.get():
         if event.type == pg.KEYDOWN:
@@ -448,7 +449,14 @@ while Running:
                 down = (True, down[1], down[2])
         elif event.type == pg.MOUSEBUTTONUP:
             down = (False, False, False)
-    printPhrase(board, phrase, (0,0), [[(200, 200, 255)]], scalingFactor=3)
+    if phrase == "access" and mode == 0:
+        printPhrase(board, phrase, (0,0), [[(background)]], scalingFactor=3)
+        phrase = ""
+        printPhrase(board, "What would you like to access: " + phrase, (0,0), [[(200, 200, 255)]], scalingFactor=3)
+        mode = 1
+    
+    if mode == 0:
+        printPhrase(board, phrase, (0,0), [[(200, 200, 255)]], scalingFactor=3)
     if down[0]:
         pg.draw.line(board, (255, 255, 255), mouse, previous_mouse)
         board.fill((255, 255, 255), pg.rect.Rect(mouse[0], mouse[1], 1, 1))
