@@ -243,15 +243,15 @@ letters: ty.Dict[
         [" "," "," "," "," "," "," "," "],
         [" ","#","#","#","#","#","#"," "],
     ],
-    "": [
+    ".": [
         [" "," "," "," "," "," "," "," "],
         [" "," "," "," "," "," "," "," "],
         [" "," "," "," "," "," "," "," "],
         [" "," "," "," "," "," "," "," "],
         [" "," "," "," "," "," "," "," "],
+        [" "," "," ","#","#"," "," "," "],
+        [" "," "," ","#","#"," "," "," "],
         [" "," "," "," "," "," "," "," "],
-        [" "," "," "," "," "," "," "," "],
-        [" ","#","#","#","#","#","#"," "],
     ],
     ">": [
         [" "," "," "," "," "," "," "," "],
@@ -332,7 +332,7 @@ def printPhrase(board: pg.Surface, phrase: str, position: ty.Tuple[float, float]
         lines.append("")
     for index, line in enumerate(lines):
         drawLine(board, line, (y_pos, x_pos), colours[index % len(colours)], scalingFactor)
-        y_pos += 9 * scalingFactor
+        y_pos += 10 * scalingFactor
 def drawLine(board: pg.Surface, phrase: str, offsets: ty.Tuple[float, float], colours: ty.List[ty.Tuple[int, int, int]], scalingFactor: float = 1) -> None:
     newLetters: ty.List[ty.List[ty.List[ty.Tuple[int, int, int, str]]]] = []
     for index in range(len(phrase)):
@@ -345,15 +345,6 @@ def drawLine(board: pg.Surface, phrase: str, offsets: ty.Tuple[float, float], co
         offsets = (offsets[0], before + max([len(line) for line in newLetters[index - 1]]) * scalingFactor*1.2)
         draw_sprite(board, offsets, letter, scalingFactor)
         before = offsets[1]
-phrase = "hello\ntest"
-previous_phrase = phrase
-pg.display.flip()
-Running = True
-down: ty.Tuple[bool, bool, bool] = (False, False, False)
-mouse: ty.Tuple[int, int] = pg.mouse.get_pos()
-capital = False
-previous_mouse = mouse
-heldKey = ""
 
 def handleChar(phrase: str, pressed_key: str, capital: bool) -> str:
     if pressed_key in "abcdefghijklmnopqrstuvwxyz":
@@ -423,18 +414,44 @@ def handleChar(phrase: str, pressed_key: str, capital: bool) -> str:
     elif pressed_key == "return":
         phrase += "\n"
     elif pressed_key == "backspace":
-        printPhrase(board, phrase, (0,0), [[(background)]], scalingFactor=3)
+        printPhrase(board, phrase, (0,0), [[(background)]], scalingFactor=globalScaling)
         phrase = phrase[:-1]
+    elif pressed_key == ",":
+        if capital:
+            phrase += "<"
+        else:
+            phrase += ","
+    elif pressed_key == ".":
+        if capital:
+            phrase += ">"
+        else:
+            phrase += "."
     else:
         print(f"Unknown value: {pressed_key!r}")
     return phrase
 
-mode = 0
+phrase = ""
+previous_phrase = phrase
+pg.display.flip()
+Running = True
+down: ty.Tuple[bool, bool, bool] = (False, False, False)
+mouse: ty.Tuple[int, int] = pg.mouse.get_pos()
+capital = False
+previous_mouse = mouse
+heldKey = ""
+
+globalScaling: float = 2
 while Running:
+    
     for event in pg.event.get():
         if event.type == pg.KEYDOWN:
             pressed_key = pg.key.name(event.key)
-            phrase = handleChar(phrase, pressed_key, capital)
+            if pressed_key == "escape":
+                board.fill((background))
+                mode = 0
+                phrase = ""
+            else:
+                phrase = handleChar(phrase, pressed_key, capital)
             
         if event.type == pg.KEYUP:
             unpressed_key = pg.key.name(event.key)
@@ -449,14 +466,9 @@ while Running:
                 down = (True, down[1], down[2])
         elif event.type == pg.MOUSEBUTTONUP:
             down = (False, False, False)
-    if phrase == "access" and mode == 0:
-        printPhrase(board, phrase, (0,0), [[(background)]], scalingFactor=3)
-        phrase = ""
-        printPhrase(board, "What would you like to access: " + phrase, (0,0), [[(200, 200, 255)]], scalingFactor=3)
-        mode = 1
-    
-    if mode == 0:
-        printPhrase(board, phrase, (0,0), [[(200, 200, 255)]], scalingFactor=3)
+            
+    printPhrase(board, previous_phrase, (0,0), [[background]], scalingFactor=globalScaling)
+    printPhrase(board, phrase, (0,0), [[(200, 200, 255)]], scalingFactor=globalScaling)
     if down[0]:
         pg.draw.line(board, (255, 255, 255), mouse, previous_mouse)
         board.fill((255, 255, 255), pg.rect.Rect(mouse[0], mouse[1], 1, 1))
