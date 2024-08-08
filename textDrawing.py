@@ -7,9 +7,9 @@ import time
 def getTime():
     return math.floor(time.time_ns() / 1000000)
 
-dims = (1000, 500)
+dims = (1500, 1000)
 pg.init()
-board = makeScreen(dims, "test")
+board = makeScreen(dims, "Text drawing space")
 background = (50, 50, 50)
 board.fill(background)
 
@@ -90,7 +90,7 @@ while Running:
                     phrase += get_char(held_key, not capital)
                 else:
                     phrase += get_char(held_key, capital)
-    if math.floor(getTime() / 750) % 2 == 0 or lastCharPress + 750 > getTime():
+    if math.floor(getTime() / 500) % 2 == 0 or lastCharPress + 200 > getTime():
         board.fill(background)
         printPhrase(board, phrase, (0,0), [[(200, 200, 255)]], dims, scalingFactor=globalScaling)
     else:

@@ -2,7 +2,7 @@ import pygame
 import time
 import math
 import random
-
+import typing as ty
 pixelsPerSpace = 20
 filledPixels = 16
 
@@ -26,7 +26,7 @@ class Block:
     def die(self) -> None:
         self.alive = False
     
-    def isDead(self) -> None:
+    def isDead(self) -> bool:
         return not self.alive
 
 
@@ -130,7 +130,7 @@ def makeBlocks(x: int, y: int, type: str, dead: list[Block]) -> list[Block]:
         return [Block(x + 1, y), Block(x, y + 1), Block(x + 1, y + 1), Block(x + 2, y + 1)]
     # default piece is Z
     return [Block(x, y), Block(x + 1, y), Block(x + 1, y + 1), Block(x + 2, y + 1)]
-def draw(screen, deadBlocks: list[Block], piece: Piece, colours = list[tuple[int, int, int]]):
+def draw(screen, deadBlocks: list[Block], piece: Piece, colours = ty.List[ty.Tuple[int, int, int]]):
     dead_colour, alive_colour = colours
     for block in deadBlocks:
         colour = dead_colour
@@ -144,8 +144,8 @@ def draw(screen, deadBlocks: list[Block], piece: Piece, colours = list[tuple[int
 
 def main():
 
-    dead_colour = (255, 75, 125)
-    alive_colour = (75, 255, 125)
+    dead_colour: ty.Tuple[int, int, int] = (255, 75, 125)
+    alive_colour: ty.Tuple[int, int, int] = (75, 255, 125)
 
     score: int = 0
     lCleared: int = 0
@@ -167,23 +167,23 @@ def main():
             if event.type == pygame.QUIT: 
                 running = False
             keys=pygame.key.get_pressed()
-            if keys[pygame.K_x]:
+            if keys[pygame.K_h]:
                 if rotateTime < time.time():
                     piece.rotate(deads)
-                    rotateTime = time.time() + 0.1
-            elif keys[pygame.K_c]:
+                    rotateTime = time.time() + 0.15
+            elif keys[pygame.K_g]:
                 if rotateTime < time.time():
                     for i in range(3):
                         piece.rotate(deads)
-                    rotateTime = time.time() + 0.1
+                    rotateTime = time.time() + 0.15
             elif keys[pygame.K_a]:
                 if moveTime < time.time():
                     piece.move(True, deads)
-                    moveTime = time.time() + 0.05
+                    moveTime = time.time() + 0.1
             elif keys[pygame.K_d]:
                 if moveTime < time.time():
                     piece.move(False, deads)
-                    moveTime = time.time() + 0.05
+                    moveTime = time.time() + 0.1
             elif keys[pygame.K_s]:
                 fallTime = min(time.time() + 0.07, fallTime)
         if fallTime < time.time():
