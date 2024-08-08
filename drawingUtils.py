@@ -1,7 +1,6 @@
 import typing as ty
 import pygame as pg
 from math import log2
-log2(1)
 def makeScreen(coordinates: tuple[int, int], name: str):
     screen = pg.display.set_mode(coordinates) 
     pg.display.set_caption(name) 
